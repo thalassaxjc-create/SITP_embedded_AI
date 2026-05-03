@@ -59,7 +59,7 @@ void mousePressed() {
   for (int i = 0; i < targetWords.length; i++) {
     float startX = width/2 + random(-100, 100);
     float startY = height/2 + random(-100, 100);
-    float startRotation = random(TWO_PI);
+    float startRotation = random(-PI / 6, PI / 6);
     float startVelX = random(-3, 3);
     float startVelY = random(-5, -1);
     
@@ -116,7 +116,7 @@ class FloatingWord {
     startY = _y;
     velX = _vx;
     velY = _vy;
-    rotation = _rot;
+    rotation = constrain(_rot, -PI / 6, PI / 6);
     rotSpeed = random(-0.05, 0.05);
     targetIndex = _index;
     
