@@ -76,7 +76,8 @@ void mousePressed() {
 }
 
 void drawSentenceByWords() {
-  fill(255);
+  fill(#00C8B3);
+
   float spacing = textWidth(" ");
   float totalWidth = 0;
 
@@ -157,7 +158,8 @@ class FloatingWord {
     pushMatrix();
     translate(x, y);
     rotate(rotation);
-    fill(255, 220, 100 + targetIndex * 20 % 155);
+    fill(#00C8B3);
+
     text(word, 0, 0);
     popMatrix();
   }
