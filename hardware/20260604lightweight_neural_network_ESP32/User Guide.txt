@@ -1,0 +1,911 @@
+# Weather Story Tiny Selector 使用说明 / User Guide
+
+## 1. 项目概述 / Project Overview
+
+**中文**
+
+Weather Story Tiny Selector 是一个运行在 ESP32-S3 上的嵌入式天气叙事系统。它会从天气 API 获取实时天气数据，将天气转换成特征向量，并结合设备内部的“性格状态”生成小故事。
+
+当前版本已经接入 TinyML：一个在电脑本地训练好的小型神经网络被转换为 `.tflite` 模型，再转换成 `model.h`，最终部署到 ESP32 工程中。ESP32 端使用 ArduTFLite / TensorFlow Lite Micro 进行模型推理，根据天气特征和性格状态预测故事 mood，例如：
+
+* `quiet`
+* `warm`
+* `strange`
+* `lonely`
+
+需要特别说明：**当前版本尚未实现在 ESP32 上训练神经网络。**
+ESP32 端只负责运行已经训练好的模型，即执行推理。神经网络的训练仍然在电脑本地完成。
+
+不过，系统已经实现了一种轻量级的本地适应机制：天气会长期影响设备的 `PersonalityState`，例如长期潮湿、阴雨、夜晚会让 `lonely` 倾向逐渐上升。这个性格状态会被保存到 ESP32 的 NVS 存储中，因此重启后仍然保留。
+
+**English**
+
+Weather Story Tiny Selector is an embedded weather-based storytelling system running on ESP32-S3. It fetches live weather data from a weather API, converts the weather into a feature vector, combines it with an internal personality state, and generates short poetic stories.
+
+The current version includes TinyML inference. A small neural network is trained locally on a computer, converted into a `.tflite` model, then converted into `model.h`, and finally deployed into the ESP32 Arduino project. On the ESP32, ArduTFLite / TensorFlow Lite Micro is used to run inference and predict a story mood from weather and personality features, such as:
+
+* `quiet`
+* `warm`
+* `strange`
+* `lonely`
+
+Important note: **the current version does not train the neural network on the ESP32.**
+The ESP32 only runs a pre-trained model for inference. Neural network training is still performed locally on a computer.
+
+However, the system does implement a lightweight form of local adaptation: weather conditions gradually update the device’s `PersonalityState`. For example, long-term humidity, rain, and nighttime conditions can gradually increase the `lonely` tendency. This personality state is saved in ESP32 NVS storage and is preserved across restarts.
+
+---
+
+## 2. 当前系统结构 / Current System Structure
+
+**中文**
+
+当前工程采用模块化结构。主要文件和职责如下：
+
+| 文件 / File                       | 职责 / Responsibility                                        |
+| ------------------------------- | ---------------------------------------------------------- |
+| `WeatherStory_TinySelector.ino` | 主程序入口，负责 Wi-Fi、天气刷新、模型初始化、整体流程调度                           |
+| `WeatherData.h`                 | 定义原始天气数据 `WeatherData` 和语义天气标签 `WeatherTags`               |
+| `FeatureExtractor.h / .cpp`     | 将天气数据、天气标签和性格状态转换为 14 维特征向量                                |
+| `PersonalityState.h`            | 定义设备的长期性格状态：`calm / weird / warm / lonely`                 |
+| `PersonalityLearning.h / .cpp`  | 根据天气特征缓慢更新性格状态                                             |
+| `PersonalityMemory.h / .cpp`    | 将性格状态保存到 ESP32 NVS，并在重启后读取                                 |
+| `StoryMoodModel.h / .cpp`       | 初始化并运行 TinyML 模型，输出 mood 概率和预测结果                           |
+| `model.h`                       | 由 `.tflite` 模型转换而来的 C 数组，包含神经网络模型数据                        |
+| `StorySelector.h / .cpp`        | 规则版 fallback；也负责把模型输出的 mood 转换为完整 `StoryControl`           |
+| `StoryControl.h`                | 定义 mood、template、vocab bank、length、randomness 等故事控制参数      |
+| `StoryGenerator.h / .cpp`       | 根据 `StoryControl` 和词库生成故事文本                                |
+| `StoryVocab.h / .cpp`           | 本地语汇库，按 mood / vocab bank 维护 subject、object、verb、place 等词组 |
+
+**English**
+
+The current project uses a modular structure. The main files and responsibilities are:
+
+| File                            | Responsibility                                                                                            |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `WeatherStory_TinySelector.ino` | Main program entry point; handles Wi-Fi, weather refresh, model initialization, and overall control flow  |
+| `WeatherData.h`                 | Defines raw weather data `WeatherData` and semantic weather tags `WeatherTags`                            |
+| `FeatureExtractor.h / .cpp`     | Converts weather data, weather tags, and personality state into a 14-dimensional feature vector           |
+| `PersonalityState.h`            | Defines the device’s long-term personality state: `calm / weird / warm / lonely`                          |
+| `PersonalityLearning.h / .cpp`  | Slowly updates the personality state based on weather features                                            |
+| `PersonalityMemory.h / .cpp`    | Saves personality state to ESP32 NVS and reloads it after restart                                         |
+| `StoryMoodModel.h / .cpp`       | Initializes and runs the TinyML model; outputs mood probabilities and predicted mood                      |
+| `model.h`                       | C array converted from the `.tflite` model; contains neural network model data                            |
+| `StorySelector.h / .cpp`        | Rule-based fallback; also converts model mood output into a complete `StoryControl`                       |
+| `StoryControl.h`                | Defines story control parameters such as mood, template, vocab bank, length, and randomness               |
+| `StoryGenerator.h / .cpp`       | Generates story text according to `StoryControl` and vocabulary                                           |
+| `StoryVocab.h / .cpp`           | Local vocabulary library organized by mood / vocab bank, including subjects, objects, verbs, places, etc. |
+
+---
+
+## 3. 整体数据流 / Overall Data Flow
+
+**中文**
+
+系统运行时的数据流如下：
+
+```text
+天气 API
+  ↓
+WeatherData 原始天气数据
+  ↓
+WeatherTags 天气语义标签
+  ↓
+第一次 makeFeatures()
+  ↓
+PersonalityLearning 更新性格
+  ↓
+PersonalityMemory 保存性格
+  ↓
+第二次 makeFeatures()
+  ↓
+TinyML 模型推理
+  ↓
+mood_id
+  ↓
+makeStoryControlFromMood()
+  ↓
+StoryControl
+  ↓
+StoryGenerator + StoryVocab
+  ↓
+生成天气小故事
+```
+
+其中，第一次生成 features 是为了让系统根据当前天气更新 `PersonalityState`。
+第二次生成 features 是为了让神经网络看到更新后的性格状态。
+
+**English**
+
+The runtime data flow is:
+
+```text
+Weather API
+  ↓
+Raw WeatherData
+  ↓
+Semantic WeatherTags
+  ↓
+First makeFeatures()
+  ↓
+PersonalityLearning updates personality
+  ↓
+PersonalityMemory saves personality
+  ↓
+Second makeFeatures()
+  ↓
+TinyML model inference
+  ↓
+mood_id
+  ↓
+makeStoryControlFromMood()
+  ↓
+StoryControl
+  ↓
+StoryGenerator + StoryVocab
+  ↓
+Generated weather story
+```
+
+The first feature vector is used to update `PersonalityState` from the current weather.
+The second feature vector is generated after the personality update, so the neural network can see the updated internal state.
+
+---
+
+## 4. TinyML 模型说明 / TinyML Model Description
+
+**中文**
+
+当前神经网络的输入是一个 14 维特征向量：
+
+```text
+0  temp_norm
+1  humidity_norm
+2  rain_norm
+3  wind_norm
+4  is_day
+5  is_hot
+6  is_humid
+7  is_rainy
+8  is_cloudy
+9  is_stormy
+10 personality_calm
+11 personality_weird
+12 personality_warm
+13 personality_lonely
+```
+
+模型输出 4 个 mood 的概率：
+
+```text
+0 quiet
+1 warm
+2 strange
+3 lonely
+```
+
+ESP32 会选择概率最高的 mood，并将其转换为完整的故事控制参数：
+
+```text
+mood_id
+template_id
+vocab_bank_id
+length_id
+randomness
+```
+
+当前模型部署流程是：
+
+```text
+电脑本地训练 Keras 模型
+  ↓
+转换为 TFLite 模型
+  ↓
+转换为 model.h
+  ↓
+放入 Arduino 工程
+  ↓
+ESP32 使用 ArduTFLite 运行推理
+```
+
+**重要限制：当前没有在 ESP32 上训练神经网络。**
+也就是说，ESP32 不会通过反向传播修改模型权重。模型权重在电脑训练完成后是固定的。ESP32 只根据输入 features 计算输出 mood。
+
+**English**
+
+The neural network currently takes a 14-dimensional feature vector as input:
+
+```text
+0  temp_norm
+1  humidity_norm
+2  rain_norm
+3  wind_norm
+4  is_day
+5  is_hot
+6  is_humid
+7  is_rainy
+8  is_cloudy
+9  is_stormy
+10 personality_calm
+11 personality_weird
+12 personality_warm
+13 personality_lonely
+```
+
+The model outputs probabilities for 4 moods:
+
+```text
+0 quiet
+1 warm
+2 strange
+3 lonely
+```
+
+The ESP32 selects the mood with the highest probability and converts it into a complete story control configuration:
+
+```text
+mood_id
+template_id
+vocab_bank_id
+length_id
+randomness
+```
+
+The current deployment pipeline is:
+
+```text
+Train Keras model locally on computer
+  ↓
+Convert to TFLite model
+  ↓
+Convert to model.h
+  ↓
+Add to Arduino project
+  ↓
+Run inference on ESP32 using ArduTFLite
+```
+
+**Important limitation: neural network training is not implemented on the ESP32.**
+The ESP32 does not update model weights using backpropagation. The model weights are fixed after local computer training. The ESP32 only calculates the output mood from the input features.
+
+---
+
+## 5. 性格系统 / Personality System
+
+**中文**
+
+设备有一个长期性格状态：
+
+```cpp
+struct PersonalityState {
+  float calm;
+  float weird;
+  float warm;
+  float lonely;
+};
+```
+
+默认值为：
+
+```text
+calm   = 0.55
+weird  = 0.30
+warm   = 0.40
+lonely = 0.25
+```
+
+天气会缓慢改变这些值。例如：
+
+* 湿度越高，`lonely` 越容易上升；
+* 下雨、阴天、潮湿会增加 wetness；
+* 夜晚会轻微推动 `lonely` 上升；
+* 暴风或异常天气会推动 `weird` 上升；
+* 长期潮湿会让 `warm` 略微下降。
+
+这种变化不是瞬间发生的。当前 `PersonalityLearning.cpp` 中使用了较小的学习率：
+
+```cpp
+const float learningRate = 0.03f;
+```
+
+这意味着每次天气刷新只会让性格移动一点点。系统表达的是“长期气候塑造性格”，而不是“当前天气直接决定性格”。
+
+**English**
+
+The device has a long-term personality state:
+
+```cpp
+struct PersonalityState {
+  float calm;
+  float weird;
+  float warm;
+  float lonely;
+};
+```
+
+The default values are:
+
+```text
+calm   = 0.55
+weird  = 0.30
+warm   = 0.40
+lonely = 0.25
+```
+
+Weather gradually changes these values. For example:
+
+* Higher humidity tends to increase `lonely`;
+* Rain, clouds, and humidity contribute to wetness;
+* Nighttime slightly increases `lonely`;
+* Stormy or unusual weather increases `weird`;
+* Long-term wetness slightly decreases `warm`.
+
+The change is gradual, not instant. In `PersonalityLearning.cpp`, the current learning rate is:
+
+```cpp
+const float learningRate = 0.03f;
+```
+
+This means each weather refresh only moves the personality slightly. The system represents “long-term climate shaping personality,” rather than “current weather directly determining personality.”
+
+---
+
+## 6. 跨重启保存 / Persistent Personality Memory
+
+**中文**
+
+设备使用 ESP32 的 `Preferences` / NVS 存储保存性格状态。相关模块是：
+
+```text
+PersonalityMemory.h
+PersonalityMemory.cpp
+```
+
+启动时，系统会尝试读取已保存的性格：
+
+```text
+Loading personality from storage...
+Loaded saved personality.
+```
+
+如果没有找到保存记录，则使用默认性格，并立即保存：
+
+```text
+No saved personality found. Using default personality.
+Personality saved to storage.
+```
+
+每次天气刷新后，如果性格变化超过一定阈值，系统会再次写入存储。这样可以避免过于频繁地写 flash。
+
+可以通过串口输入 `r` 或 `R` 重置性格存储：
+
+```text
+r
+```
+
+重置后，性格会恢复默认值，并重新保存。
+
+**English**
+
+The device uses ESP32 `Preferences` / NVS storage to save personality state. The relevant modules are:
+
+```text
+PersonalityMemory.h
+PersonalityMemory.cpp
+```
+
+On startup, the system tries to load the saved personality:
+
+```text
+Loading personality from storage...
+Loaded saved personality.
+```
+
+If no saved record is found, the default personality is used and saved immediately:
+
+```text
+No saved personality found. Using default personality.
+Personality saved to storage.
+```
+
+After each weather refresh, the system saves personality again only if the change is large enough. This avoids writing to flash too frequently.
+
+The personality storage can be reset through Serial Monitor by sending `r` or `R`:
+
+```text
+r
+```
+
+After reset, the personality returns to default values and is saved again.
+
+---
+
+## 7. 故事生成与语汇库 / Story Generation and Vocabulary Library
+
+**中文**
+
+故事生成由两个部分组成：
+
+```text
+StoryGenerator.cpp
+StoryVocab.cpp
+```
+
+`StoryGenerator.cpp` 负责句子结构和模板，例如：
+
+* waiting
+* discovery
+* change
+* return
+
+`StoryVocab.cpp` 负责维护本地语汇库。每个词库包含：
+
+```text
+subjects
+objects
+verbs
+places
+adjectives
+endings
+```
+
+词库按 mood / vocab bank 分组：
+
+```text
+quiet   → rain_room
+warm    → sun_animal
+strange → strange_objects
+lonely  → night_city
+```
+
+如果故事重复或词汇匮乏，主要维护 `StoryVocab.cpp`。例如想让 `lonely` 更丰富，可以扩展：
+
+```cpp
+lonelySubjects[]
+lonelyObjects[]
+lonelyVerbs[]
+lonelyPlaces[]
+lonelyAdjectives[]
+lonelyEndings[]
+```
+
+不要优先在 `StoryGenerator.cpp` 中写大量完整句子。更推荐维护词组和语义槽位，这样同一个模板可以组合出更多变化。
+
+**English**
+
+Story generation consists of two parts:
+
+```text
+StoryGenerator.cpp
+StoryVocab.cpp
+```
+
+`StoryGenerator.cpp` controls sentence structures and templates, such as:
+
+* waiting
+* discovery
+* change
+* return
+
+`StoryVocab.cpp` maintains the local vocabulary library. Each vocabulary set includes:
+
+```text
+subjects
+objects
+verbs
+places
+adjectives
+endings
+```
+
+Vocabulary banks are grouped by mood:
+
+```text
+quiet   → rain_room
+warm    → sun_animal
+strange → strange_objects
+lonely  → night_city
+```
+
+If stories feel repetitive or vocabulary feels limited, the main file to edit is `StoryVocab.cpp`. For example, to enrich `lonely`, expand:
+
+```cpp
+lonelySubjects[]
+lonelyObjects[]
+lonelyVerbs[]
+lonelyPlaces[]
+lonelyAdjectives[]
+lonelyEndings[]
+```
+
+It is better not to write many complete fixed sentences directly in `StoryGenerator.cpp`. Maintaining phrase-level semantic slots allows the same template to generate more variations.
+
+---
+
+## 8. 自动刷新逻辑 / Auto Refresh Logic
+
+**中文**
+
+系统会在不断电运行时定期刷新天气。当前刷新间隔为：
+
+```cpp
+const unsigned long WEATHER_REFRESH_INTERVAL_MS = 10UL * 60UL * 1000UL;
+```
+
+也就是每 10 分钟刷新一次天气。
+
+每次刷新会执行：
+
+```text
+请求天气 API
+解析天气 JSON
+生成 WeatherTags
+生成 features
+更新 PersonalityState
+保存 PersonalityState
+重新生成 features
+运行 TinyML 推理
+生成 StoryControl
+生成故事
+更新当前显示状态
+```
+
+为了调试方便，当前页面轮播默认关闭：
+
+```cpp
+const bool ENABLE_PAGE_CAROUSEL = false;
+```
+
+如果需要恢复串口页面轮播，可以改为：
+
+```cpp
+const bool ENABLE_PAGE_CAROUSEL = true;
+```
+
+**English**
+
+The system refreshes weather periodically while powered on. The current refresh interval is:
+
+```cpp
+const unsigned long WEATHER_REFRESH_INTERVAL_MS = 10UL * 60UL * 1000UL;
+```
+
+This means the weather refreshes every 10 minutes.
+
+Each refresh performs:
+
+```text
+Request weather API
+Parse weather JSON
+Generate WeatherTags
+Generate features
+Update PersonalityState
+Save PersonalityState
+Regenerate features
+Run TinyML inference
+Generate StoryControl
+Generate story
+Update current display state
+```
+
+For debugging, page carousel output is currently disabled by default:
+
+```cpp
+const bool ENABLE_PAGE_CAROUSEL = false;
+```
+
+To enable automatic page output in Serial Monitor, change it to:
+
+```cpp
+const bool ENABLE_PAGE_CAROUSEL = true;
+```
+
+---
+
+## 9. 使用步骤 / How to Use
+
+**中文**
+
+1. 打开 Arduino 工程文件夹：
+
+```text
+WeatherStory_TinySelector/
+```
+
+2. 确保主文件名与文件夹名一致：
+
+```text
+WeatherStory_TinySelector.ino
+```
+
+3. 在 `.ino` 中设置 Wi-Fi：
+
+```cpp
+const char* WIFI_SSID = "enter Wifi";
+const char* WIFI_PASSWORD = "enter password";
+```
+
+4. 根据需要修改经纬度：
+
+```cpp
+const float LATITUDE = 45.508888;
+const float LONGITUDE = -73.561668;
+```
+
+5. 确认已安装库：
+
+```text
+WiFi
+HTTPClient
+WiFiClientSecure
+ArduinoJson
+ArduTFLite
+Chirale_TensorFlowLite
+Preferences
+```
+
+6. 选择 ESP32-S3 开发板。
+
+7. 编译并上传。
+
+8. 打开 Serial Monitor，波特率设置为：
+
+```text
+115200
+```
+
+9. 观察输出：
+
+```text
+Loading personality from storage...
+Story mood model initialized with ArduTFLite.
+Requesting weather API...
+Feature Vector:
+TinyML Model Output:
+Weather sentence:
+Tiny weather story:
+```
+
+**English**
+
+1. Open the Arduino project folder:
+
+```text
+WeatherStory_TinySelector/
+```
+
+2. Make sure the main file name matches the folder name:
+
+```text
+WeatherStory_TinySelector.ino
+```
+
+3. Set Wi-Fi credentials in the `.ino` file:
+
+```cpp
+const char* WIFI_SSID = "enter Wifi";
+const char* WIFI_PASSWORD = "enter password";
+```
+
+4. Modify latitude and longitude if needed:
+
+```cpp
+const float LATITUDE = 45.508888;
+const float LONGITUDE = -73.561668;
+```
+
+5. Make sure the required libraries are installed:
+
+```text
+WiFi
+HTTPClient
+WiFiClientSecure
+ArduinoJson
+ArduTFLite
+Chirale_TensorFlowLite
+Preferences
+```
+
+6. Select an ESP32-S3 board.
+
+7. Compile and upload.
+
+8. Open Serial Monitor and set baud rate to:
+
+```text
+115200
+```
+
+9. Check the output:
+
+```text
+Loading personality from storage...
+Story mood model initialized with ArduTFLite.
+Requesting weather API...
+Feature Vector:
+TinyML Model Output:
+Weather sentence:
+Tiny weather story:
+```
+
+---
+
+## 10. 当前已实现功能 / Implemented Features
+
+**中文**
+
+当前已经实现：
+
+* 从天气 API 获取实时天气；
+* 解析温度、湿度、雨量、风速、昼夜、天气代码；
+* 生成天气语义标签；
+* 生成 14 维特征向量；
+* 在电脑本地训练小型神经网络；
+* 将模型转换为 TFLite；
+* 将 TFLite 转换为 `model.h`；
+* 在 ESP32 上运行 TinyML 推理；
+* 根据模型输出选择 mood；
+* 根据 mood 生成完整 `StoryControl`；
+* 根据 `StoryControl` 生成故事；
+* 使用本地语汇库维护故事词汇；
+* 根据天气缓慢更新性格；
+* 将性格状态保存到 NVS；
+* 重启后恢复性格状态；
+* 支持定时自动刷新天气与故事。
+
+**English**
+
+Currently implemented:
+
+* Fetch live weather from a weather API;
+* Parse temperature, humidity, rain, wind speed, day/night, and weather code;
+* Generate semantic weather tags;
+* Generate a 14-dimensional feature vector;
+* Train a small neural network locally on a computer;
+* Convert the model to TFLite;
+* Convert TFLite to `model.h`;
+* Run TinyML inference on ESP32;
+* Select mood from model output;
+* Convert mood into full `StoryControl`;
+* Generate story from `StoryControl`;
+* Maintain story vocabulary through a local vocabulary library;
+* Slowly update personality from weather;
+* Save personality state to NVS;
+* Restore personality after restart;
+* Support periodic weather and story refresh while powered on.
+
+---
+
+## 11. 当前尚未实现 / Not Yet Implemented
+
+**中文**
+
+当前尚未实现：
+
+1. **ESP32 端神经网络训练**
+   ESP32 目前不会训练神经网络，也不会修改模型权重。训练仍然在电脑本地完成。
+
+2. **在线反向传播 / 梯度更新**
+   设备不会根据新天气样本或用户反馈执行 backpropagation。
+
+3. **自动扩展语汇库**
+   当前语汇库需要手动维护。设备不会自己发明新词并写入词库。
+
+4. **用户反馈学习**
+   当前性格主要由天气影响，还没有接入“用户喜欢 / 不喜欢某个故事”的反馈机制。
+
+5. **复杂长期记忆系统**
+   目前保存的是四个性格浮点值，不保存完整故事历史、天气历史或用户交互历史。
+
+6. **真正开放式语言生成**
+   当前故事生成仍然是模板 + 词库组合，不是大语言模型式的开放生成。
+
+**English**
+
+Not yet implemented:
+
+1. **On-device neural network training on ESP32**
+   The ESP32 currently does not train the neural network or modify model weights. Training is still performed locally on a computer.
+
+2. **Online backpropagation / gradient updates**
+   The device does not run backpropagation based on new weather samples or user feedback.
+
+3. **Automatic vocabulary expansion**
+   The vocabulary library is manually maintained. The device does not invent new words and write them into the vocabulary bank.
+
+4. **User feedback learning**
+   The current personality update is mainly weather-driven. User feedback such as “liked / disliked this story” is not yet integrated.
+
+5. **Complex long-term memory system**
+   The current memory stores only four personality float values. It does not store full story history, weather history, or user interaction history.
+
+6. **Fully open-ended language generation**
+   Story generation is still template + vocabulary based. It is not open-ended generation like a large language model.
+
+---
+
+## 12. 推荐后续方向 / Suggested Next Steps
+
+**中文**
+
+后续可以继续发展为三个方向：
+
+### 方向 A：用户反馈影响性格
+
+加入按钮或串口输入，例如：
+
+```text
+l = like
+d = dislike
+```
+
+如果用户喜欢 `strange` 故事，则提高 `personality.weird`。
+如果用户喜欢 `lonely` 故事，则提高 `personality.lonely`。
+
+### 方向 B：天气历史记忆
+
+除了保存性格，也保存最近几次天气摘要，例如：
+
+```text
+recentWetDays
+recentNightCount
+recentStormCount
+```
+
+这样系统可以更明确地区分“一次下雨”和“长期潮湿”。
+
+### 方向 C：重新训练模型
+
+当规则、性格机制和故事目标稳定后，可以重新生成训练数据，并在电脑本地重新训练神经网络。新的模型再转换成 TFLite 和 `model.h`，部署到 ESP32。
+
+**English**
+
+Future development can continue in three directions:
+
+### Direction A: User feedback affects personality
+
+Add button or Serial input, for example:
+
+```text
+l = like
+d = dislike
+```
+
+If the user likes a `strange` story, increase `personality.weird`.
+If the user likes a `lonely` story, increase `personality.lonely`.
+
+### Direction B: Weather history memory
+
+In addition to saving personality, store recent weather summaries, such as:
+
+```text
+recentWetDays
+recentNightCount
+recentStormCount
+```
+
+This would allow the system to distinguish between “one rainy moment” and “long-term wet weather.”
+
+### Direction C: Retrain the model
+
+After the rules, personality mechanism, and story goals become stable, new training data can be generated and the neural network can be retrained locally on the computer. The new model can then be converted to TFLite and `model.h`, and deployed again to the ESP32.
+
+---
+
+## 13. 一句话总结 / Summary
+
+**中文**
+
+当前系统已经实现了：
+**ESP32 上的小型神经网络推理 + 天气驱动的长期性格变化 + 跨重启保存 + 本地语汇库故事生成。**
+
+但当前系统尚未实现：
+**ESP32 上训练神经网络。**
+
+**English**
+
+The current system implements:
+**small neural network inference on ESP32 + weather-driven long-term personality adaptation + persistent personality memory + local vocabulary-based story generation.**
+
+The current system does not yet implement:
+**neural network training on ESP32.**
