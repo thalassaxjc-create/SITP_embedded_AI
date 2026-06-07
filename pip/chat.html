@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pip · A Desk Lamp That Grows Up</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f14;
+    --surface: #1a1a24;
+    --surface2: #22222f;
+    --border: #2a2a3a;
+    --text: #e8e6f0;
+    --text-dim: #8886a0;
+    --accent: #f5c542;
+    --accent-glow: rgba(245,197,66,0.15);
+    --accent-dim: #c9a235;
+    --pip: #f5c542;
+    --user: #6e8efb;
+    --danger: #e85d5d;
+    --success: #5dd89a;
+    --radius: 14px;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ====== LEFT: Chat Panel ====== */
+  .chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .chat-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+  }
+
+  .lamp-icon {
+    width: 44px; height: 44px;
+    background: var(--accent-glow);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    animation: glow-pulse 3s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 8px var(--accent-glow); }
+    50% { box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(245,197,66,0.08); }
+  }
+
+  .header-info h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .header-info p {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .interaction-count {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  /* Messages area */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    line-height: 1.7;
+    animation: msg-in 0.3s ease-out;
+    position: relative;
+    word-wrap: break-word;
+    white-space: pre-wrap;   /* let line breaks/paragraphs in long stories show correctly */
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.pip {
+    align-self: flex-start;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg.pip::before {
+    content: '💡';
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    font-size: 14px;
+  }
+
+  .msg.user {
+    align-self: flex-end;
+    background: rgba(110,142,251,0.15);
+    border: 1px solid rgba(110,142,251,0.25);
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg.system {
+    align-self: center;
+    background: rgba(245,197,66,0.08);
+    border: 1px solid rgba(245,197,66,0.15);
+    font-size: 12px;
+    color: var(--accent-dim);
+    border-radius: 20px;
+    padding: 6px 16px;
+    max-width: 90%;
+    text-align: center;
+  }
+
+  .msg.typing {
+    align-self: flex-start;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+    color: var(--text-dim);
+  }
+
+  .typing-dots span {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: bounce 1.4s infinite;
+  }
+
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-6px); }
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .input-row input[type="text"] {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-row input[type="text"]:focus {
+    border-color: var(--accent);
+  }
+
+  .input-row input[type="text"]::placeholder {
+    color: var(--text-dim);
+  }
+
+  .btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:active { transform: scale(0.96); }
+
+  .btn-send {
+    background: var(--accent);
+    color: #111;
+  }
+  .btn-send:hover { background: #ffd666; }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-feedback {
+    background: rgba(93,216,154,0.12);
+    color: var(--success);
+    border: 1px solid rgba(93,216,154,0.25);
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  .btn-feedback:hover { background: rgba(93,216,154,0.2); }
+
+  .btn-sensor {
+    background: rgba(110,142,251,0.12);
+    color: var(--user);
+    border: 1px solid rgba(110,142,251,0.25);
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  .btn-sensor:hover { background: rgba(110,142,251,0.2); }
+
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+  }
+
+  .mode-tab {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .mode-tab.active {
+    background: var(--accent-glow);
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* quick chips (tell a story / continue, etc.) */
+  .quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover {
+    border-color: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* ====== RIGHT: Personality Panel ====== */
+  .personality-panel {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .personality-panel::-webkit-scrollbar { width: 4px; }
+  .personality-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .panel-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  /* Trait bars */
+  .trait {
+    margin-bottom: 14px;
+  }
+
+  .trait-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .trait-name {
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  .trait-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .trait-bar {
+    height: 6px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .trait-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1), background 0.6s;
+    position: relative;
+  }
+
+  .trait-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 12px;
+    background: inherit;
+    filter: blur(4px);
+    opacity: 0.6;
+  }
+
+  .trait-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 3px;
+    opacity: 0.6;
+  }
+
+  /* Diary */
+  .diary-entry {
+    font-size: 12px;
+    color: var(--text-dim);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .diary-entry:last-child { border-bottom: none; }
+
+  .diary-empty {
+    font-size: 12px;
+    color: var(--text-dim);
+    opacity: 0.4;
+    font-style: italic;
+  }
+
+  /* Quirks */
+  .quirk-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-dim);
+    margin: 3px 4px 3px 0;
+  }
+
+  /* Sensor sliders */
+  .sensor-group {
+    margin-bottom: 14px;
+  }
+
+  .sensor-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .sensor-val {
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    color: var(--user);
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--bg);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--user);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(110,142,251,0.4);
+  }
+
+  .day-toggle {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .day-btn {
+    flex: 1;
+    padding: 6px;
+    font-size: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .day-btn.active {
+    background: rgba(110,142,251,0.15);
+    border-color: rgba(110,142,251,0.4);
+    color: var(--user);
+  }
+
+  /* Reset button */
+  .btn-reset {
+    width: 100%;
+    padding: 10px;
+    background: rgba(232,93,93,0.08);
+    color: var(--danger);
+    border: 1px solid rgba(232,93,93,0.2);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-reset:hover { background: rgba(232,93,93,0.15); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .personality-panel {
+      width: 100%;
+      max-height: 40vh;
+      border-left: none;
+      border-top: 1px solid var(--border);
+    }
+    .chat-panel { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== LEFT: Chat ====== -->
+<div class="chat-panel">
+  <div class="chat-header">
+    <div class="lamp-icon">💡</div>
+    <div class="header-info">
+      <h1 id="pipName">Pip</h1>
+      <p id="pipIdentity">a little desk lamp just beginning to sense this room</p>
+    </div>
+    <div class="interaction-count" id="interactionCount">Chat #0</div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="msg system">Hi! I'm Pip. Chat with me, give me feedback, and watch my personality slowly change ✨</div>
+  </div>
+
+  <div class="input-area">
+    <div class="mode-tabs">
+      <div class="mode-tab active" data-mode="chat" onclick="setMode('chat')">💬 Chat</div>
+      <div class="mode-tab" data-mode="feedback" onclick="setMode('feedback')">🛠 Feedback</div>
+      <div class="mode-tab" data-mode="sensor" onclick="setMode('sensor')">📡 Sensors</div>
+      <div class="mode-tab" id="clearBtn" style="margin-left:auto" onclick="forgetMemory()">🧹 Clear Memory</div>
+    </div>
+    <div class="quick-chips" id="quickChips">
+      <span class="chip" onclick="quickSend('Tell me a story about the room you live in')">✨ Tell a story</span>
+      <span class="chip" onclick="quickSend('Keep going')">↪️ Continue</span>
+      <span class="chip" onclick="quickSend('Do you remember what we were just talking about?')">🧠 Do you remember?</span>
+    </div>
+    <div class="input-row">
+      <input type="text" id="userInput"
+             placeholder="Say something to Pip..."
+             onkeydown="if(event.key==='Enter'&&!event.shiftKey)handleSend()">
+      <button class="btn btn-send" id="sendBtn" onclick="handleSend()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== RIGHT: Personality ====== -->
+<div class="personality-panel">
+  <!-- Traits -->
+  <div class="panel-section">
+    <div class="panel-title">🧬 Personality</div>
+    <div id="traitsContainer"></div>
+  </div>
+
+  <!-- Sensors -->
+  <div class="panel-section">
+    <div class="panel-title">📡 Virtual Sensors</div>
+    <div class="sensor-group">
+      <div class="sensor-label"><span>🌡️ Temperature</span><span class="sensor-val" id="tempVal">22°C</span></div>
+      <input type="range" id="tempSlider" min="-10" max="45" value="22"
+             oninput="document.getElementById('tempVal').textContent=this.value+'°C'">
+    </div>
+    <div class="sensor-group">
+      <div class="sensor-label"><span>💧 Humidity</span><span class="sensor-val" id="humVal">50%</span></div>
+      <input type="range" id="humSlider" min="0" max="100" value="50"
+             oninput="document.getElementById('humVal').textContent=this.value+'%'">
+    </div>
+    <div class="sensor-group">
+      <div class="sensor-label"><span>☀️ Light</span><span class="sensor-val" id="lightVal">400</span></div>
+      <input type="range" id="lightSlider" min="0" max="1000" value="400"
+             oninput="document.getElementById('lightVal').textContent=this.value">
+    </div>
+    <div class="sensor-group">
+      <div class="sensor-label"><span>🌗 Day / Night</span></div>
+      <div class="day-toggle">
+        <div class="day-btn active" id="dayBtn" onclick="setDay(1)">☀️ Day</div>
+        <div class="day-btn" id="nightBtn" onclick="setDay(0)">🌙 Night</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diary -->
+  <div class="panel-section">
+    <div class="panel-title">📖 Mood Diary</div>
+    <div id="diaryContainer">
+      <div class="diary-empty">No mood entries yet...</div>
+    </div>
+  </div>
+
+  <!-- Quirks -->
+  <div class="panel-section">
+    <div class="panel-title">🗣️ Speech Habits</div>
+    <div id="quirksContainer">
+      <div class="diary-empty">No special habits yet</div>
+    </div>
+  </div>
+
+  <!-- Reset -->
+  <div class="panel-section">
+    <button class="btn-reset" onclick="resetPersonality()">🔄 Reset personality to factory settings</button>
+  </div>
+</div>
+
+<script>
+// ====== State ======
+let currentMode = 'chat';   // 'chat' | 'feedback' | 'sensor'
+let lastPipReply = '';
+let isDay = 1;
+let busy = false;
+
+const traitColors = {
+  warmth:        '#f5c542',
+  playfulness:   '#f57b42',
+  talkativeness: '#42c5f5',
+  moodiness:     '#c542f5',
+  curiosity:     '#5df542',
+  poeticness:    '#f542a1',
+};
+
+const traitNames = {
+  warmth:        'Warmth',
+  playfulness:   'Playful',
+  talkativeness: 'Talkative',
+  moodiness:     'Moody',
+  curiosity:     'Curious',
+  poeticness:    'Poetic',
+};
+
+const traitLabels = {
+  warmth:        ['Cold', 'Warm'],
+  playfulness:   ['Serious', 'Playful'],
+  talkativeness: ['Terse', 'Chatty'],
+  moodiness:     ['Steady', 'Moody'],
+  curiosity:     ['Aloof', 'Curious'],
+  poeticness:    ['Plain', 'Poetic'],
+};
+
+
+// ====== Init ======
+fetchState();
+loadHistory();
+
+// On page load, restore the conversation Pip remembers into the chat window.
+function loadHistory() {
+  fetch('/history').then(r => r.json()).then(hist => {
+    if (!Array.isArray(hist) || hist.length === 0) return;
+    const m = document.getElementById('messages');
+    m.innerHTML = '';   // clear the default welcome message and replace it with the real history
+    hist.forEach(turn => {
+      if (turn.role === 'model') {
+        addMsg(turn.text, 'pip');
+        lastPipReply = turn.text;
+      } else {
+        addMsg(turn.text, 'user');
+      }
+    });
+  }).catch(() => {});
+}
+
+function fetchState() {
+  fetch('/state').then(r => r.json()).then(p => {
+    updateTraitsUI(p.traits);
+    updateDiaryUI(p.diary || []);
+    updateQuirksUI(p.speech_quirks || []);
+    document.getElementById('pipName').textContent = p.name || 'Pip';
+    document.getElementById('pipIdentity').textContent = p.core_identity || '';
+    document.getElementById('interactionCount').textContent = 'Chat #' + (p.interaction_count || 0);
+  });
+}
+
+
+// ====== Mode switching ======
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab[data-mode]').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+  document.getElementById('quickChips').style.display = (mode === 'chat') ? 'flex' : 'none';
+
+  const input = document.getElementById('userInput');
+  const btn = document.getElementById('sendBtn');
+
+  if (mode === 'chat') {
+    input.placeholder = 'Say something to Pip...';
+    btn.textContent = 'Send';
+    btn.className = 'btn btn-send';
+  } else if (mode === 'feedback') {
+    input.placeholder = 'Tell Pip what you think of it, e.g. "too wordy"...';
+    btn.textContent = 'Feedback';
+    btn.className = 'btn btn-feedback';
+  } else {
+    input.placeholder = '(Optional) add a line, or just hit send to let it sense the room';
+    btn.textContent = 'Sense';
+    btn.className = 'btn btn-sensor';
+  }
+  input.focus();
+}
+
+
+// ====== Day toggle ======
+function setDay(v) {
+  isDay = v;
+  document.getElementById('dayBtn').classList.toggle('active', v === 1);
+  document.getElementById('nightBtn').classList.toggle('active', v === 0);
+}
+
+
+// ====== Get sensor data ======
+function getSensor() {
+  return {
+    temperature: parseInt(document.getElementById('tempSlider').value),
+    humidity:    parseInt(document.getElementById('humSlider').value),
+    light:       parseInt(document.getElementById('lightSlider').value),
+    is_day:      isDay,
+  };
+}
+
+
+// ====== Messages ======
+function addMsg(text, type) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + type;
+  el.textContent = text;
+  document.getElementById('messages').appendChild(el);
+  scrollBottom();
+}
+
+function addTyping() {
+  const el = document.createElement('div');
+  el.className = 'msg typing';
+  el.id = 'typingIndicator';
+  el.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  document.getElementById('messages').appendChild(el);
+  scrollBottom();
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function scrollBottom() {
+  const m = document.getElementById('messages');
+  m.scrollTop = m.scrollHeight;
+}
+
+
+// ====== Send ======
+async function handleSend() {
+  if (busy) return;
+
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+
+  if (currentMode === 'chat') {
+    if (!text) return;
+    addMsg(text, 'user');
+    input.value = '';
+    busy = true;
+    addTyping();
+
+    try {
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message: text, sensor: getSensor() }),
+      });
+      const data = await res.json();
+      removeTyping();
+      if (data.reply) {
+        addMsg(data.reply, 'pip');
+        lastPipReply = data.reply;
+      } else {
+        addMsg("(Pip went quiet... maybe it's thinking)", 'system');
+      }
+      if (data.traits) updateTraitsUI(data.traits);
+      fetchState();
+    } catch (e) {
+      removeTyping();
+      addMsg('⚠️ Connection error: ' + e.message, 'system');
+    }
+    busy = false;
+
+  } else if (currentMode === 'feedback') {
+    if (!text) return;
+    if (!lastPipReply) {
+      addMsg('💡 Chat with Pip first, then give feedback', 'system');
+      return;
+    }
+    addMsg('📝 Feedback: ' + text, 'user');
+    input.value = '';
+    busy = true;
+    addTyping();
+
+    try {
+      const res = await fetch('/feedback', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ feedback: text, last_story: lastPipReply }),
+      });
+      const data = await res.json();
+      removeTyping();
+
+      if (data.error) {
+        addMsg('⚠️ ' + data.error, 'system');
+      } else {
+        const note = data.diary_note ? `"${data.diary_note}"` : '';
+        addMsg(`✨ Personality fine-tuned ${note}`, 'system');
+        if (data.updated_traits) updateTraitsUI(data.updated_traits);
+        fetchState();
+      }
+    } catch (e) {
+      removeTyping();
+      addMsg('⚠️ Connection error: ' + e.message, 'system');
+    }
+    busy = false;
+
+  } else {
+    // sensor mode
+    const sensor = getSensor();
+    const extra = text || '';
+    addMsg(`📡 Environment: ${sensor.temperature}°C / ${sensor.humidity}% / light ${sensor.light} / ${sensor.is_day?'day':'night'}` + (extra ? ` — "${extra}"` : ''), 'user');
+    input.value = '';
+    busy = true;
+    addTyping();
+
+    try {
+      const body = extra
+        ? { message: extra, sensor: sensor }
+        : sensor;
+      const endpoint = extra ? '/chat' : '/story';
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      removeTyping();
+
+      const reply = data.reply || data.story;
+      if (reply) {
+        addMsg(reply, 'pip');
+        lastPipReply = reply;
+      } else {
+        addMsg('(Pip went quiet...)', 'system');
+      }
+      if (data.traits) updateTraitsUI(data.traits);
+      fetchState();
+    } catch (e) {
+      removeTyping();
+      addMsg('⚠️ Connection error: ' + e.message, 'system');
+    }
+    busy = false;
+  }
+}
+
+
+// ====== Traits UI ======
+function updateTraitsUI(traits) {
+  const container = document.getElementById('traitsContainer');
+  container.innerHTML = '';
+
+  for (const [key, val] of Object.entries(traits)) {
+    const pct = (val * 100).toFixed(0);
+    const color = traitColors[key] || '#888';
+    const name = traitNames[key] || key;
+    const [lo, hi] = traitLabels[key] || ['Low', 'High'];
+
+    container.innerHTML += `
+      <div class="trait">
+        <div class="trait-header">
+          <span class="trait-name">${name}</span>
+          <span class="trait-value">${val.toFixed(2)}</span>
+        </div>
+        <div class="trait-bar">
+          <div class="trait-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="trait-labels"><span>${lo}</span><span>${hi}</span></div>
+      </div>
+    `;
+  }
+}
+
+
+// ====== Diary UI ======
+function updateDiaryUI(diary) {
+  const c = document.getElementById('diaryContainer');
+  if (!diary || diary.length === 0) {
+    c.innerHTML = '<div class="diary-empty">No mood entries yet...</div>';
+    return;
+  }
+  c.innerHTML = diary.slice(-5).reverse().map(d => `<div class="diary-entry">"${d}"</div>`).join('');
+}
+
+
+// ====== Quirks UI ======
+function updateQuirksUI(quirks) {
+  const c = document.getElementById('quirksContainer');
+  if (!quirks || quirks.length === 0) {
+    c.innerHTML = '<div class="diary-empty">No special habits yet</div>';
+    return;
+  }
+  c.innerHTML = quirks.map(q => `<span class="quirk-tag">${q}</span>`).join('');
+}
+
+
+// ====== Quick chips & forget ======
+// Click a quick chip: switch back to chat mode and send immediately.
+function quickSend(text) {
+  setMode('chat');
+  document.getElementById('userInput').value = text;
+  handleSend();
+}
+
+// Clear the conversation memory (but keep the personality and diary).
+async function forgetMemory() {
+  if (!confirm("Clear your conversation memory with Pip? Its personality and diary stay, but it won't remember what you were just talking about.")) return;
+  await fetch('/forget', { method: 'POST' });
+  lastPipReply = '';
+  document.getElementById('messages').innerHTML = '';
+  addMsg("🧹 Conversation memory cleared — let's start fresh ~", 'system');
+}
+
+
+// ====== Reset ======
+async function resetPersonality() {
+  if (!confirm("Are you sure you want to reset Pip's personality? All growth records will be lost.")) return;
+
+  await fetch('/reset', { method: 'POST' });
+  lastPipReply = '';
+  addMsg('🔄 Personality reset to factory settings', 'system');
+  fetchState();
+}
+</script>
+</body>
+</html>
