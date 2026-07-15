@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#line 1 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
 /*
   Weather Story + TinyML-ready Story Selector
   第一阶段：架构拆分版
@@ -79,6 +81,61 @@ unsigned long lastWeatherRefresh = 0;
 
 // ===================== K10 screen + Serial output / 屏幕与串口输出 =====================
 
+#line 82 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void clearScreen();
+#line 87 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool appendScreenLine( String lines[], int maxLines, int& lineCount, const String& value );
+#line 102 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+int wrapTextToLines( const String& text, String lines[], int maxLines, int maxChars );
+#line 167 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+int drawWrappedText( const String& text, int startLine, int endLine, int color );
+#line 189 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void initDisplay();
+#line 199 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printDivider();
+#line 236 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool connectWiFi();
+#line 267 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void ensureWiFiConnected();
+#line 280 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+String buildWeatherUrl();
+#line 291 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool fetchWeather(WeatherData& w);
+#line 365 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool isRainCode(int code);
+#line 373 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool isCloudCode(int code);
+#line 381 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool isStormCode(int code);
+#line 386 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+WeatherTags makeTags(const WeatherData& w);
+#line 459 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+String buildWeatherSentence(const WeatherTags& t);
+#line 499 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printWeather(const WeatherData& w);
+#line 533 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printTags(const WeatherTags& t);
+#line 591 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printFeatureVector(const float features[FEATURE_COUNT]);
+#line 619 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printControl(const StoryControl& c);
+#line 641 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printWeatherPage(const WeatherData& w, const WeatherTags& t, const String& sentence);
+#line 672 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void printStoryPage( const WeatherData& w, const WeatherTags& t, const StoryControl& c, const String& story );
+#line 700 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void drawWeatherPage(const WeatherData& w, const WeatherTags& t, const String& sentence);
+#line 716 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void drawStoryPage( const WeatherTags& t, const StoryControl& c, const String& story );
+#line 732 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void showCurrentPage();
+#line 749 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+bool refreshWeatherAndStory();
+#line 873 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void setup();
+#line 923 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
+void loop();
+#line 82 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
 void clearScreen() {
   k10.canvas->canvasClear();
   k10.setScreenBackground(0xFFFFFF);
@@ -952,3 +1009,4 @@ void loop() {
 
   delay(20);
 }
+

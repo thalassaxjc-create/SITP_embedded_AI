@@ -1,4 +1,22 @@
-# Weather Story Tiny Selector 使用说明 / User Guide
+# Weather Story Tiny Selector K10 使用说明 / User Guide
+
+## K10 快速开始（2026-07-14 版本）
+
+Arduino 主工程：
+
+```text
+WeatherStory_TinySelector_K10/WeatherStory_TinySelector_K10.ino
+```
+
+1. Arduino IDE 的开发板选择 `unihiker k10`（FQBN：`UNIHIKER:esp32:k10`）。
+2. 在主程序中填写 `WIFI_SSID` 和 `WIFI_PASSWORD`。
+3. 编译并上传后，K10 屏幕会依次显示启动/联网状态、天气摘要和 TinyML 故事。
+4. 天气页和故事页每 5 秒切换一次；天气每 10 分钟刷新一次。
+5. 英文文字每行最多 21 个字符，并优先在空格处换行。故事字符串中的 `\n` 会产生一次明确换行，不会额外空一行；超出本页可显示范围时，末行以 `...` 标记。
+
+所需库：K10 板卡包自带的 `unihiker_k10`、ArduinoJson、ArduTFLite 及其 TensorFlow Lite 依赖。串口监视器波特率为 115200，可用于查看联网、天气请求、特征向量和模型推理调试信息。
+
+---
 
 ## 1. 项目概述 / Project Overview
 

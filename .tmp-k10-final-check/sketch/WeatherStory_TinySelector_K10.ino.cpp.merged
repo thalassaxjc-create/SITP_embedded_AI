@@ -1,3 +1,5 @@
+#include <Arduino.h>
+#line 1 "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10\\WeatherStory_TinySelector_K10.ino"
 /*
   Weather Story + TinyML-ready Story Selector
   第一阶段：架构拆分版
@@ -952,3 +954,4 @@ void loop() {
 
   delay(20);
 }
+
