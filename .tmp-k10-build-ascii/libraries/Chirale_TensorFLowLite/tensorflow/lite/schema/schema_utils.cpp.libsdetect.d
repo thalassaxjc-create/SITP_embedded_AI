@@ -1,0 +1,25 @@
+schema_utils.o: \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src\tensorflow\lite\schema\schema_utils.cpp \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/schema/schema_utils.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/flatbuffers.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/array.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/base.h \
+ X:\AppData\Local\Arduino15\packages\UNIHIKER\hardware\esp32\0.0.3/tools/sdk/esp32s3/include/newlib/platform_include/assert.h \
+ X:\AppData\Local\Arduino15\packages\UNIHIKER\hardware\esp32\0.0.3/tools/sdk/esp32s3/qio_opi/include/sdkconfig.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/stl_emulation.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/vector.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/buffer.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/buffer_ref.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/verifier.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/detached_buffer.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/allocator.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/default_allocator.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/flatbuffer_builder.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/string.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/struct.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/table.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/flatbuffers/include/flatbuffers/vector_downward.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/schema/schema_generated.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/compatibility.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/op_macros.h \
+ X:\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/micro/debug_log.h
