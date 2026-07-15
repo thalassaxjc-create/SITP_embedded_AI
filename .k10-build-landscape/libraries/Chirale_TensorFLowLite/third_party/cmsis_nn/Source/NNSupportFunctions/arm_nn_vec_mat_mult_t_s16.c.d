@@ -1,0 +1,7 @@
+E:\projects\SITP_embeded\ AI\SITP_embedded_AI\.k10-build-landscape\libraries\Chirale_TensorFLowLite\third_party\cmsis_nn\Source\NNSupportFunctions\arm_nn_vec_mat_mult_t_s16.c.o: \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src\third_party\cmsis_nn\Source\NNSupportFunctions\arm_nn_vec_mat_mult_t_s16.c \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/cmsis_nn/Include/arm_nnsupportfunctions.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/cmsis_nn/Include/arm_nn_math_types.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/cmsis/CMSIS/Core/Include/cmsis_compiler.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/cmsis/CMSIS/Core/Include/cmsis_gcc.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/cmsis_nn/Include/arm_nn_types.h

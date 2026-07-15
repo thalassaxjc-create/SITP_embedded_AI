@@ -1,0 +1,13 @@
+E:\projects\SITP_embeded\ AI\SITP_embedded_AI\.k10-build-landscape\libraries\Chirale_TensorFLowLite\tensorflow\lite\kernels\internal\reference\portable_tensor_utils.cpp.o: \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src\tensorflow\lite\kernels\internal\reference\portable_tensor_utils.cpp \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/third_party/gemmlowp/fixedpoint/fixedpoint.h \
+ c:\users\神威无敌大将军核弹\documents\arduino\libraries\chirale_tensorflowlite\src\third_party\gemmlowp\internal\detect_platform.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/common.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/cppmath.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/optimized/neon_check.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/types.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/compatibility.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/op_macros.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/micro/debug_log.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/runtime_shape.h \
+ C:\Users\神威无敌大将军核弹\Documents\Arduino\libraries\Chirale_TensorFLowLite\src/tensorflow/lite/kernels/internal/reference/portable_tensor_utils_impl.h

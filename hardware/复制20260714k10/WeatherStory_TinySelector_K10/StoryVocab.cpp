@@ -2,360 +2,238 @@
 
 #define COUNT_OF(arr) (sizeof(arr) / sizeof((arr)[0]))
 
-// --------------------------------------------------
-// QUIET / RAIN ROOM
-// --------------------------------------------------
+// The first entries in each group are the safest demo sentences. Higher
+// randomness can reach the stranger, more opinionated fragments later on.
 
-const char* const quietSubjects[] = {
-  "the room",
-  "the rain",
-  "a cup",
-  "the window",
-  "a soft lamp",
-  "the floor",
-  "a small table",
-  "the curtain",
-  "a sleeping book",
-  "the quiet wall"
+const char* const quietOpenings[] = {
+  "Hello from {FROM_CITY}.",
+  "{TIME_OF_DAY} in {FROM_CITY} has gone quiet.",
+  "I am writing this beside a window in {FROM_CITY}.",
+  "The room is almost empty now.",
+  "A small weather note arrived from {FROM_CITY}.",
+  "The library table is free for once.",
+  "I waited a minute before sending this.",
+  "No hurry to answer this."
 };
 
-const char* const quietObjects[] = {
-  "a drop of water",
-  "a folded note",
-  "a quiet sound",
-  "a sleeping book",
-  "a silver line",
-  "a small reflection",
-  "a warm cup",
-  "a slow shadow",
-  "a thin trace of light",
-  "a quiet breath"
+const char* const quietObservations[] = {
+  "{FROM_CITY} is {FROM_WEATHER} at {FROM_TEMP}C.",
+  "The screen says {FROM_WEATHER}, and the window agrees.",
+  "The weather here is {FROM_WEATHER}; it makes people lower their voices.",
+  "My notes are beside the forecast: {FROM_TEMP}C.",
+  "The campus path looks slower in this {FROM_WEATHER} weather.",
+  "Someone left a wet umbrella near the door.",
+  "The bicycle seats outside still look suspicious.",
+  "The library windows have turned the color of the sky.",
+  "Even the vending machine sounds quieter today.",
+  "A sensor on this side has been watching the air.",
+  "The forecast changed, but the room did not.",
+  "The small machine reports the weather more calmly than I do."
 };
 
-const char* const quietVerbs[] = {
-  "listened to",
-  "held",
-  "covered",
-  "waited beside",
-  "softened",
-  "followed",
-  "counted",
-  "kept",
-  "touched",
-  "remembered"
-};
-
-const char* const quietPlaces[] = {
-  "beside the window",
-  "inside the rain",
-  "under the soft light",
-  "near the quiet wall",
-  "on the wooden floor",
-  "behind the curtain",
-  "at the edge of the table",
-  "inside the small room"
-};
-
-const char* const quietAdjectives[] = {
-  "soft",
-  "still",
-  "dim",
-  "silver",
-  "slow",
-  "gentle",
-  "small",
-  "clear",
-  "pale",
-  "quiet"
+const char* const quietConnections[] = {
+  "{TO_CITY} is {TO_WEATHER} at {TO_TEMP}C.",
+  "Your city is {TEMP_DIFF}C away from mine today.",
+  "The two forecasts fit on one small screen.",
+  "Your weather stayed open on the display after class.",
+  "Maybe your sidewalk is drier than mine.",
+  "If your side is also quiet, we can call it a tie.",
+  "The API brought your temperature here before dinner.",
+  "Our weather is close enough to share one sentence.",
+  "The robot carried this note like it was careful with it.",
+  "I keep checking whether your sky changed too."
 };
 
 const char* const quietEndings[] = {
-  "Nothing hurried.",
-  "The room stayed awake for a little longer.",
-  "Even the rain seemed to speak softly.",
-  "No one needed to answer.",
-  "The small silence remained.",
-  "Everything became a little lighter."
+  "No reply is needed.",
+  "I only wanted to send the weather.",
+  "I will leave the letter here.",
+  "The screen can keep it for a while.",
+  "That is all for now.",
+  "The room stayed awake a little longer.",
+  "Please read it when your side slows down.",
+  "The last line is just the temperature."
 };
 
-
-// --------------------------------------------------
-// WARM / SUN ANIMAL
-// --------------------------------------------------
-
-const char* const warmSubjects[] = {
-  "a small animal",
-  "the sun",
-  "a childlike cloud",
-  "a bright leaf",
-  "the garden",
-  "a yellow bird",
-  "a warm stone",
-  "the morning",
-  "a little path",
-  "a sleepy cat"
+const char* const warmOpenings[] = {
+  "Good afternoon from {FROM_CITY}.",
+  "{FROM_CITY} feels easier to walk through today.",
+  "I am sending a small bright report.",
+  "Lunch ended and the weather behaved for once.",
+  "This is a decent day for a cold drink.",
+  "The campus finally looks less tired.",
+  "Someone laughed near the convenience store.",
+  "I have almost forgiven the forecast."
 };
 
-const char* const warmObjects[] = {
-  "a seed",
-  "a round shadow",
-  "a golden sound",
-  "a tiny map",
-  "a warm secret",
-  "a piece of bread",
-  "a bright feather",
-  "a sleeping flower",
-  "a soft footprint",
-  "a small bell"
+const char* const warmObservations[] = {
+  "{FROM_CITY} is {FROM_WEATHER} at {FROM_TEMP}C.",
+  "The air here is {FROM_WEATHER}, which feels almost useful.",
+  "The shade outside the classroom is doing real work.",
+  "A drink shop sign looks more persuasive than usual.",
+  "The sun came out after lunch and surprised everyone.",
+  "My bag is warm from sitting near the window.",
+  "The campus path smells a little like rain and food.",
+  "The forecast says {FROM_TEMP}C; my face believes it.",
+  "The device is warm too, but that may be its personality.",
+  "People are walking slower, not unhappily.",
+  "Even the model seemed to choose a softer mood.",
+  "A small breeze crossed the table at the right time."
 };
 
-const char* const warmVerbs[] = {
-  "found",
-  "carried",
-  "followed",
-  "woke",
-  "shared",
-  "opened",
-  "warmed",
-  "protected",
-  "noticed",
-  "welcomed"
-};
-
-const char* const warmPlaces[] = {
-  "under the morning sun",
-  "beside the garden path",
-  "near the bright grass",
-  "inside a warm breeze",
-  "at the edge of the yard",
-  "under a yellow tree",
-  "beside a sleeping flower",
-  "near the open door"
-};
-
-const char* const warmAdjectives[] = {
-  "warm",
-  "golden",
-  "bright",
-  "round",
-  "gentle",
-  "soft",
-  "small",
-  "sleepy",
-  "kind",
-  "green"
+const char* const warmConnections[] = {
+  "{TO_CITY} is {TO_WEATHER} at {TO_TEMP}C.",
+  "Your city is only {TEMP_DIFF}C different today.",
+  "If your side is warm too, buy the cold drink.",
+  "The two temperatures look like they could share lunch.",
+  "Your forecast arrived while I was choosing dinner.",
+  "The robot moved as if it had good news.",
+  "A tiny model decided this was worth sending.",
+  "Maybe both campuses have the same slow afternoon.",
+  "Your weather makes this note feel less random.",
+  "I hope your shade is better than ours."
 };
 
 const char* const warmEndings[] = {
-  "The day became easier to enter.",
-  "Something small was glad to be found.",
-  "The light stayed close.",
-  "No one was alone for long.",
-  "The garden kept the secret kindly.",
-  "The morning answered with warmth."
+  "Save something cold for later.",
+  "This seems worth reporting.",
+  "That is the whole cheerful part.",
+  "I am taking this as a good sign.",
+  "Please accept this very small update.",
+  "The screen looked pleased with itself.",
+  "I will send another note when the sky changes.",
+  "For now, the weather is behaving."
 };
 
-
-// --------------------------------------------------
-// STRANGE / STRANGE OBJECTS
-// --------------------------------------------------
-
-const char* const strangeSubjects[] = {
-  "the mirror",
-  "a clock",
-  "a mushroom",
-  "the blue chair",
-  "a paper fish",
-  "the hallway",
-  "a glass spoon",
-  "the old radio",
-  "a door without a room",
-  "a quiet machine"
+const char* const strangeOpenings[] = {
+  "The model chose strange again.",
+  "Something odd happened in {FROM_CITY}.",
+  "The sensor has an opinion today.",
+  "I checked the forecast twice.",
+  "This machine is trying to sound calm.",
+  "The sky and the API may need to talk.",
+  "I am reporting a minor weather disagreement.",
+  "Please inspect the following cloud when convenient."
 };
 
-const char* const strangeObjects[] = {
-  "its own name",
-  "a backwards shadow",
-  "a missing minute",
-  "a folded moon",
-  "a small impossible sound",
-  "a map of nowhere",
-  "a wooden star",
-  "a sleeping question",
-  "a second sky",
-  "a secret alphabet"
+const char* const strangeObservations[] = {
+  "{FROM_CITY} is listed as {FROM_WEATHER} at {FROM_TEMP}C.",
+  "The sensor says {FROM_WEATHER}; the window is considering it.",
+  "The forecast changed while I was still reading it.",
+  "A number on the screen blinked like it knew too much.",
+  "The motor started before I finished judging the sky.",
+  "The air here feels like a bug report.",
+  "The device checked the weather and became involved.",
+  "A cloud may have left before this message did.",
+  "The classroom fan is making its own prediction.",
+  "My notes now contain both data and suspicion.",
+  "The weather code looks normal, which is suspicious.",
+  "The small screen is too confident for its size."
 };
 
-const char* const strangeVerbs[] = {
-  "changed",
-  "misplaced",
-  "invented",
-  "swallowed",
-  "returned",
-  "translated",
-  "hid",
-  "borrowed",
-  "grew",
-  "forgot"
-};
-
-const char* const strangePlaces[] = {
-  "inside the mirror",
-  "behind the clock",
-  "under the table",
-  "in the wrong afternoon",
-  "beside the blue door",
-  "between two shadows",
-  "inside a glass room",
-  "near the sleeping machine"
-};
-
-const char* const strangeAdjectives[] = {
-  "blue",
-  "crooked",
-  "impossible",
-  "backwards",
-  "hollow",
-  "silent",
-  "glass",
-  "wrong",
-  "tiny",
-  "unwritten"
+const char* const strangeConnections[] = {
+  "{TO_CITY} reports {TO_WEATHER} at {TO_TEMP}C.",
+  "Your side differs by {TEMP_DIFF}C, which feels intentional.",
+  "If your sky is clearer, I may have received the wrong cloud.",
+  "The two cities disagree in a very organized way.",
+  "The API placed both forecasts in the same tiny room.",
+  "Please return any spare sunshine when convenient.",
+  "The robot has already treated this as urgent.",
+  "Your temperature made the model change its mind.",
+  "Maybe your side can verify whether this is weather.",
+  "I am choosing not to argue with the data yet."
 };
 
 const char* const strangeEndings[] = {
-  "After that, the room refused to be ordinary.",
-  "No one could remember which way time had gone.",
-  "The object pretended this was normal.",
-  "A second silence appeared.",
-  "The air changed its mind.",
-  "Something small learned a new shape."
+  "Please advise the sky.",
+  "I will file this under weather.",
+  "Do not trust the cloud completely.",
+  "The machine appears satisfied.",
+  "This is probably normal.",
+  "I am not promising that it makes sense.",
+  "The next reading may deny everything.",
+  "End of report, unfortunately."
 };
 
-
-// --------------------------------------------------
-// LONELY / NIGHT CITY
-// --------------------------------------------------
-
-const char* const lonelySubjects[] = {
-  "the city",
-  "a window",
-  "a quiet street",
-  "a small light",
-  "the station",
-  "a distant room",
-  "the night",
-  "a forgotten house",
-  "a late train",
-  "a blue sign"
+const char* const lonelyOpenings[] = {
+  "{TIME_OF_DAY} in {FROM_CITY} is still awake.",
+  "The last class ended a while ago.",
+  "I am sending this after the room emptied.",
+  "The station lights are still on.",
+  "A late note from {FROM_CITY}.",
+  "The lab is quiet except for the fan.",
+  "I missed the easy time to write.",
+  "The screen lit up before anyone answered."
 };
 
-const char* const lonelyObjects[] = {
-  "a shadow",
-  "a letter",
-  "a closed door",
-  "a quiet song",
-  "a forgotten sound",
-  "a small memory",
-  "a paper bird",
-  "an empty chair",
-  "a distant voice",
-  "a name in the rain"
+const char* const lonelyObservations[] = {
+  "{FROM_CITY} is {FROM_WEATHER} at {FROM_TEMP}C.",
+  "The weather here is {FROM_WEATHER}, and the glass looks tired.",
+  "The forecast is the only new thing on my desk.",
+  "The corridor feels longer in this weather.",
+  "A bus passed with almost nobody inside.",
+  "The unfinished work stayed exactly where it was.",
+  "The air has cooled around the window frame.",
+  "The vending machine light is doing its best.",
+  "The sensor keeps measuring things after everyone leaves.",
+  "The campus gate looked farther away than usual.",
+  "The rain mark on my shoe has not dried yet.",
+  "The small robot moved, then the room went quiet again."
 };
 
-const char* const lonelyVerbs[] = {
-  "remembered",
-  "waited for",
-  "carried",
-  "hid",
-  "followed",
-  "called back",
-  "lost",
-  "kept",
-  "looked for",
-  "returned to"
-};
-
-const char* const lonelyPlaces[] = {
-  "under the night sky",
-  "near the wet glass",
-  "beside the empty station",
-  "at the end of the street",
-  "inside the blue dark",
-  "behind a quiet window",
-  "under a distant lamp",
-  "near the last train"
-};
-
-const char* const lonelyAdjectives[] = {
-  "distant",
-  "pale",
-  "quiet",
-  "blue",
-  "thin",
-  "forgotten",
-  "slow",
-  "silent",
-  "empty",
-  "late"
+const char* const lonelyConnections[] = {
+  "{TO_CITY} is {TO_WEATHER} at {TO_TEMP}C.",
+  "Your temperature changed by {TEMP_DIFF}C from mine.",
+  "Your weather is still glowing on this screen.",
+  "The two cities are both awake, apparently.",
+  "I do not know if your side is quiet too.",
+  "The API brought your sky here without making noise.",
+  "A reply can wait until morning.",
+  "The distance is just numbers tonight.",
+  "The robot delivered the note and stopped.",
+  "Your forecast stayed after the browser closed."
 };
 
 const char* const lonelyEndings[] = {
-  "By night, it returned as a tiny story.",
-  "No one saw it leave.",
-  "The city kept listening.",
-  "The window stayed bright for no reason.",
-  "Something far away almost answered.",
-  "The street remembered a softer time."
+  "I will leave the letter here.",
+  "No need to answer tonight.",
+  "The screen can keep watch.",
+  "That is enough for this hour.",
+  "The last train has probably gone.",
+  "I am going to pack up slowly.",
+  "Maybe the next reading will be warmer.",
+  "The light is still on."
 };
 
-
-// --------------------------------------------------
-// VOCAB SETS
-// --------------------------------------------------
-
-const VocabSet quietSet = {
-  quietSubjects, COUNT_OF(quietSubjects),
-  quietObjects, COUNT_OF(quietObjects),
-  quietVerbs, COUNT_OF(quietVerbs),
-  quietPlaces, COUNT_OF(quietPlaces),
-  quietAdjectives, COUNT_OF(quietAdjectives),
+const LetterVocabSet quietSet = {
+  quietOpenings, COUNT_OF(quietOpenings),
+  quietObservations, COUNT_OF(quietObservations),
+  quietConnections, COUNT_OF(quietConnections),
   quietEndings, COUNT_OF(quietEndings)
 };
 
-const VocabSet warmSet = {
-  warmSubjects, COUNT_OF(warmSubjects),
-  warmObjects, COUNT_OF(warmObjects),
-  warmVerbs, COUNT_OF(warmVerbs),
-  warmPlaces, COUNT_OF(warmPlaces),
-  warmAdjectives, COUNT_OF(warmAdjectives),
+const LetterVocabSet warmSet = {
+  warmOpenings, COUNT_OF(warmOpenings),
+  warmObservations, COUNT_OF(warmObservations),
+  warmConnections, COUNT_OF(warmConnections),
   warmEndings, COUNT_OF(warmEndings)
 };
 
-const VocabSet strangeSet = {
-  strangeSubjects, COUNT_OF(strangeSubjects),
-  strangeObjects, COUNT_OF(strangeObjects),
-  strangeVerbs, COUNT_OF(strangeVerbs),
-  strangePlaces, COUNT_OF(strangePlaces),
-  strangeAdjectives, COUNT_OF(strangeAdjectives),
+const LetterVocabSet strangeSet = {
+  strangeOpenings, COUNT_OF(strangeOpenings),
+  strangeObservations, COUNT_OF(strangeObservations),
+  strangeConnections, COUNT_OF(strangeConnections),
   strangeEndings, COUNT_OF(strangeEndings)
 };
 
-const VocabSet lonelySet = {
-  lonelySubjects, COUNT_OF(lonelySubjects),
-  lonelyObjects, COUNT_OF(lonelyObjects),
-  lonelyVerbs, COUNT_OF(lonelyVerbs),
-  lonelyPlaces, COUNT_OF(lonelyPlaces),
-  lonelyAdjectives, COUNT_OF(lonelyAdjectives),
+const LetterVocabSet lonelySet = {
+  lonelyOpenings, COUNT_OF(lonelyOpenings),
+  lonelyObservations, COUNT_OF(lonelyObservations),
+  lonelyConnections, COUNT_OF(lonelyConnections),
   lonelyEndings, COUNT_OF(lonelyEndings)
 };
 
-
-// --------------------------------------------------
-// PUBLIC FUNCTIONS
-// --------------------------------------------------
-
-const VocabSet& getVocabSet(
+const LetterVocabSet& getVocabSet(
   int vocabBankId
 ) {
   switch (vocabBankId) {
@@ -376,7 +254,7 @@ const VocabSet& getVocabSet(
   }
 }
 
-const char* pickWord(
+const char* pickFragment(
   const char* const words[],
   int count
 ) {

@@ -4,31 +4,25 @@
 #include <Arduino.h>
 #include "StoryControl.h"
 
-struct VocabSet {
-  const char* const* subjects;
-  int subjectCount;
+struct LetterVocabSet {
+  const char* const* openings;
+  int openingCount;
 
-  const char* const* objects;
-  int objectCount;
+  const char* const* observations;
+  int observationCount;
 
-  const char* const* verbs;
-  int verbCount;
-
-  const char* const* places;
-  int placeCount;
-
-  const char* const* adjectives;
-  int adjectiveCount;
+  const char* const* connections;
+  int connectionCount;
 
   const char* const* endings;
   int endingCount;
 };
 
-const VocabSet& getVocabSet(
+const LetterVocabSet& getVocabSet(
   int vocabBankId
 );
 
-const char* pickWord(
+const char* pickFragment(
   const char* const words[],
   int count
 );

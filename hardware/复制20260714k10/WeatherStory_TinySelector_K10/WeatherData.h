@@ -28,6 +28,7 @@ struct WeatherTags {
   bool dry;
 
   bool rainy;
+  bool snowy;
   bool cloudy;
   bool stormy;
   bool windy;

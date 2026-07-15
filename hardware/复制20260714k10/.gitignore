@@ -1,0 +1,16 @@
+# Local Arduino build products and IDE caches
+.arduino-build*/
+.arduino-cache*/
+.arduino-cli-temp.yaml
+.cache/
+*.o
+*.a
+*.elf
+*.bin
+*.map
+*.d
+*.tmp
+
+# Python cache created by the retained offline training utilities
+__pycache__/
+*.pyc
