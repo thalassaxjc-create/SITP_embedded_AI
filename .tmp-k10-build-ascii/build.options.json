@@ -1,0 +1,9 @@
+{
+  "additionalFiles": "..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..",
+  "compiler.optimization_flags": "-Os",
+  "customBuildProperties": "",
+  "fqbn": "UNIHIKER:esp32:k10",
+  "hardwareFolders": "X:\\AppData\\Local\\Arduino15\\packages\\UNIHIKER\\hardware\\esp32\\0.0.3,X:\\AppData\\Local\\Arduino15\\packages\\UNIHIKER\\hardware\\esp32\\0.0.3",
+  "otherLibrariesFolders": "X:\\Documents\\Arduino\\libraries",
+  "sketchLocation": "E:\\projects\\SITP_embeded AI\\SITP_embedded_AI\\hardware\\复制20260714k10\\WeatherStory_TinySelector_K10"
+}

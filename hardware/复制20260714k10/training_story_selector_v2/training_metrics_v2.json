@@ -1,0 +1,84 @@
+{
+  "seed": 20260604,
+  "rows": 7600,
+  "train_rows": 6080,
+  "test_rows": 1520,
+  "label_distribution": {
+    "quiet": 1921,
+    "warm": 1696,
+    "strange": 1705,
+    "lonely": 2278
+  },
+  "full": {
+    "name": "14D full personality model",
+    "input_size": 14,
+    "epochs": 59,
+    "train_loss": 0.9939517378807068,
+    "train_accuracy": 0.9743421052631579,
+    "test_loss": 0.9969489574432373,
+    "test_accuracy": 0.9697368421052631,
+    "confusion_matrix": [
+      [
+        367,
+        5,
+        1,
+        11
+      ],
+      [
+        2,
+        329,
+        8,
+        0
+      ],
+      [
+        0,
+        4,
+        330,
+        7
+      ],
+      [
+        4,
+        2,
+        2,
+        448
+      ]
+    ],
+    "classification_report": "              precision    recall  f1-score   support\n\n       quiet     0.9839    0.9557    0.9696       384\n        warm     0.9676    0.9705    0.9691       339\n     strange     0.9677    0.9677    0.9677       341\n      lonely     0.9614    0.9825    0.9718       456\n\n    accuracy                         0.9697      1520\n   macro avg     0.9702    0.9691    0.9696      1520\nweighted avg     0.9699    0.9697    0.9697      1520\n"
+  },
+  "weather_only": {
+    "name": "10D weather-only model",
+    "input_size": 10,
+    "epochs": 67,
+    "train_loss": 1.1686973571777344,
+    "train_accuracy": 0.6376644736842105,
+    "test_loss": 1.1663912534713745,
+    "test_accuracy": 0.655921052631579,
+    "confusion_matrix": [
+      [
+        146,
+        88,
+        11,
+        139
+      ],
+      [
+        29,
+        284,
+        8,
+        18
+      ],
+      [
+        11,
+        62,
+        215,
+        53
+      ],
+      [
+        20,
+        70,
+        14,
+        352
+      ]
+    ],
+    "classification_report": "              precision    recall  f1-score   support\n\n       quiet     0.7087    0.3802    0.4949       384\n        warm     0.5635    0.8378    0.6738       339\n     strange     0.8669    0.6305    0.7301       341\n      lonely     0.6263    0.7719    0.6916       456\n\n    accuracy                         0.6559      1520\n   macro avg     0.6914    0.6551    0.6476      1520\nweighted avg     0.6871    0.6559    0.6465      1520\n"
+  }
+}

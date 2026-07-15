@@ -1,0 +1,4 @@
+directories:
+  data: X:/AppData/Local/Arduino15
+  downloads: X:/AppData/Local/Arduino15/staging
+  user: X:/Documents/Arduino
